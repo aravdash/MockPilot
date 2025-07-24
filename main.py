@@ -228,4 +228,8 @@ def main():
         return 1
 
 if __name__ == "__main__":
+    # For testing - uncomment and modify the path below
+    # import sys
+    # sys.argv = ['main.py', r'C:\path\to\your\test\document.pdf']
+    
     sys.exit(main())
