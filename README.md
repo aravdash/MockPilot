@@ -40,19 +40,34 @@ echo "OPENAI_API_KEY=your_openai_api_key_here" > .env
 
 ### Basic Usage
 
-Process a PDF document:
+**Process a PDF document (default JSON output):**
 ```bash
 python main.py document.pdf
 ```
 
-With custom output file:
+**Output as readable text:**
 ```bash
-python main.py document.pdf -o results.json
+python main.py document.pdf -f text
 ```
 
-Verbose logging:
+**Output as RAG-optimized text:**
+```bash
+python main.py document.pdf -f rag
+```
+
+**With custom output file:**
+```bash
+python main.py document.pdf -o results.txt -f text
+```
+
+**Verbose logging:**
 ```bash
 python main.py document.pdf -v
+```
+
+**Convert existing JSON to text:**
+```bash
+python convert_json_to_text.py results.json -f rag
 ```
 
 ## 📁 Project Structure
@@ -70,6 +85,7 @@ notes-summarizer/
 │       ├── code_extractor.py    # Code detection
 │       └── diagram_extractor.py # Diagram analysis (OpenAI)
 ├── main.py                      # Main application
+├── convert_json_to_text.py     # JSON to text converter
 ├── requirements.txt            # Dependencies
 ├── .env                       # Environment variables
 └── README.md                  # This file
@@ -115,7 +131,9 @@ PDF Input → Image Conversion → Layout Analysis → Content Classification �
 4. **Diagrams**: OpenAI GPT-4V (only for complex visuals)
 5. **Text**: PaddleOCR + EasyOCR fallback (default)
 
-## 📊 Output Format
+## 📊 Output Formats
+
+### JSON Format (Default)
 
 The system outputs JSON with the following structure:
 
@@ -155,6 +173,65 @@ The system outputs JSON with the following structure:
     "diagrams": 0
   }
 }
+```
+
+### Text Format (Human Readable)
+
+When using `-f text`, the output is formatted as clean, readable text:
+
+```
+DOCUMENT: Hashing3
+==================================================
+
+DOCUMENT SUMMARY:
+Total Pages: 3
+Text Regions: 15
+Tables: 2
+Equations: 5
+Diagrams: 1
+==================================================
+
+PAGE 1
+
+Introduction to Hash Functions
+
+Hash functions are mathematical algorithms that transform input data 
+of arbitrary size into fixed-size output values...
+
+TABLES:
+Table 1:
+Headers: Algorithm | Time Complexity | Space Complexity
+----------------------------------------
+Row 1: SHA-256 | O(n) | O(1)
+Row 2: MD5 | O(n) | O(1)
+(Confidence: 0.92, Rows: 3, Columns: 3)
+
+MATHEMATICAL EQUATIONS:
+Equation 1:
+LaTeX: H(x) = \sum_{i=0}^{n-1} x_i \cdot 2^i \mod p
+(Confidence: 0.88)
+
+------------------------------
+```
+
+### RAG Format (Optimized for AI)
+
+When using `-f rag`, the output is optimized for RAG systems:
+
+```
+Document: Hashing3
+
+Introduction to Hash Functions
+
+Hash functions are mathematical algorithms that transform input data of arbitrary size into fixed-size output values.
+
+Table with columns: Algorithm, Time Complexity, Space Complexity
+Row 1 - Algorithm: SHA-256, Time Complexity: O(n), Space Complexity: O(1)
+Row 2 - Algorithm: MD5, Time Complexity: O(n), Space Complexity: O(1)
+
+Mathematical equation: H(x) = \sum_{i=0}^{n-1} x_i \cdot 2^i \mod p
+
+The collision resistance property ensures that finding two different inputs that produce the same hash output is computationally infeasible.
 ```
 
 ## 🛠️ Advanced Usage

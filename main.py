@@ -16,6 +16,7 @@ sys.path.insert(0, str(Path(__file__).parent / "src"))
 from src.config import settings
 from src.extractors.text_extractor import TextExtractor
 from src.extractors.table_extractor import TableExtractor
+from src.processors.text_formatter import TextFormatter
 
 # Set up logging
 logging.basicConfig(
@@ -30,6 +31,7 @@ class DocumentProcessor:
     def __init__(self):
         self.text_extractor = TextExtractor()
         self.table_extractor = TableExtractor()
+        self.text_formatter = TextFormatter()
         logger.info("Document processor initialized")
     
     def process_pdf(self, pdf_path: Path) -> Dict[str, Any]:
@@ -184,17 +186,29 @@ class DocumentProcessor:
             'confidence': 1.0
         }]
     
-    def save_results(self, results: Dict[str, Any], output_path: Path):
+    def save_results(self, results: Dict[str, Any], output_path: Path, output_format: str = 'json'):
         """Save processing results to file"""
-        import json
+        if output_format == 'text':
+            # Save as readable text
+            text_content = self.text_formatter.format_results(results)
+            with open(output_path, 'w', encoding='utf-8') as f:
+                f.write(text_content)
         
-        # Convert results to JSON-serializable format
-        serializable_results = self._make_serializable(results)
+        elif output_format == 'rag':
+            # Save as RAG-optimized text
+            text_content = self.text_formatter.format_for_rag(results)
+            with open(output_path, 'w', encoding='utf-8') as f:
+                f.write(text_content)
         
-        with open(output_path, 'w', encoding='utf-8') as f:
-            json.dump(serializable_results, f, indent=2, ensure_ascii=False)
+        else:  # json format (default)
+            import json
+            # Convert results to JSON-serializable format
+            serializable_results = self._make_serializable(results)
+            
+            with open(output_path, 'w', encoding='utf-8') as f:
+                json.dump(serializable_results, f, indent=2, ensure_ascii=False)
         
-        logger.info(f"Results saved to {output_path}")
+        logger.info(f"Results saved to {output_path} in {output_format} format")
     
     def _make_serializable(self, obj):
         """Convert object to JSON-serializable format"""
@@ -211,7 +225,9 @@ def main():
     """Main entry point"""
     parser = argparse.ArgumentParser(description="Process documents with advanced OCR")
     parser.add_argument("input", type=Path, help="Input PDF file")
-    parser.add_argument("-o", "--output", type=Path, help="Output JSON file")
+    parser.add_argument("-o", "--output", type=Path, help="Output file")
+    parser.add_argument("-f", "--format", choices=['json', 'text', 'rag'], default='json', 
+                       help="Output format: json (default), text (readable), or rag (optimized for RAG systems)")
     parser.add_argument("-v", "--verbose", action="store_true", help="Verbose logging")
     
     args = parser.parse_args()
@@ -228,9 +244,12 @@ def main():
         logger.error("Only PDF files are supported")
         return 1
     
-    # Set default output path
+    # Set default output path based on format
     if not args.output:
-        args.output = args.input.with_suffix('.json')
+        if args.format == 'json':
+            args.output = args.input.with_suffix('.json')
+        else:
+            args.output = args.input.with_suffix('.txt')
     
     try:
         # Process document
@@ -238,7 +257,7 @@ def main():
         results = processor.process_pdf(args.input)
         
         # Save results
-        processor.save_results(results, args.output)
+        processor.save_results(results, args.output, args.format)
         
         # Print summary
         summary = results['summary']
