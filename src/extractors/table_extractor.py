@@ -26,7 +26,6 @@ class TableExtractor(BaseExtractor):
                     ocr=True,
                     show_log=False,
                     recovery=True,  # Enables table structure recovery
-                    use_gpu=settings.USE_GPU,
                     lang=settings.PADDLE_OCR_LANG
                 )
                 self.engine_available = True

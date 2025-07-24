@@ -76,6 +76,7 @@ class DocumentProcessor:
     
     def _pdf_to_images(self, pdf_path: Path) -> List:
         """Convert PDF to list of images"""
+        # Try pdf2image first (requires poppler)
         try:
             from pdf2image import convert_from_path
             
@@ -85,14 +86,40 @@ class DocumentProcessor:
                 fmt='RGB'
             )
             
-            logger.info(f"Converted PDF to {len(images)} images")
+            logger.info(f"Converted PDF to {len(images)} images using pdf2image")
             return images
             
         except ImportError:
-            logger.error("pdf2image not installed. Please install it: pip install pdf2image")
+            logger.warning("pdf2image not installed. Trying PyMuPDF fallback...")
+        except Exception as e:
+            logger.warning(f"pdf2image failed: {e}. Trying PyMuPDF fallback...")
+        
+        # Fallback to PyMuPDF (no poppler required)
+        try:
+            import fitz  # PyMuPDF
+            from PIL import Image
+            import io
+            
+            doc = fitz.open(pdf_path)
+            images = []
+            
+            for page_num in range(len(doc)):
+                page = doc.load_page(page_num)
+                mat = fitz.Matrix(settings.DPI/72, settings.DPI/72)  # Scale factor
+                pix = page.get_pixmap(matrix=mat)
+                img_data = pix.tobytes("ppm")
+                img = Image.open(io.BytesIO(img_data))
+                images.append(img)
+            
+            doc.close()
+            logger.info(f"Converted PDF to {len(images)} images using PyMuPDF")
+            return images
+            
+        except ImportError:
+            logger.error("Neither pdf2image nor PyMuPDF available. Please install one: pip install pdf2image OR pip install PyMuPDF")
             return []
         except Exception as e:
-            logger.error(f"Failed to convert PDF to images: {e}")
+            logger.error(f"Failed to convert PDF to images with PyMuPDF: {e}")
             return []
     
     def _process_page(self, image, page_num: int) -> Dict[str, Any]:

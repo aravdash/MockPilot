@@ -19,7 +19,6 @@ class TextExtractor(BaseExtractor):
             self.paddle_ocr = paddleocr.PaddleOCR(
                 use_angle_cls=True,
                 lang=settings.PADDLE_OCR_LANG,
-                use_gpu=settings.USE_GPU,
                 show_log=False
             )
             self.paddle_available = True
@@ -30,7 +29,7 @@ class TextExtractor(BaseExtractor):
         
         # Initialize EasyOCR as fallback
         try:
-            self.easy_ocr = easyocr.Reader(['en'], gpu=settings.USE_GPU)
+            self.easy_ocr = easyocr.Reader(['en'], gpu=False)  # CPU mode for compatibility
             self.easy_available = True
             self.logger.info("EasyOCR initialized successfully")
         except Exception as e:
