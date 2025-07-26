@@ -29,11 +29,6 @@ fastapi>=0.104.0
 uvicorn>=0.24.0
 python-multipart>=0.0.6
 
-# Django REST Framework (Optional)
-djangorestframework>=3.14.0
-django-filter>=23.0
-django-cors-headers>=4.0.0
-
 # Document Processing
 PyMuPDF>=1.23.0  # Alternative to pdf2image
 python-docx>=0.8.11
