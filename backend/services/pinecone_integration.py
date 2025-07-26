@@ -15,7 +15,7 @@ from typing import List, Dict, Any
 import hashlib
 
 # Add backend to path for direct imports if needed
-sys.path.append('backend')
+sys.path.append(str(Path(__file__).parent.parent))
 
 class NotesToPinecone:
     """Integrate OCR-processed notes with Pinecone vector database"""
@@ -64,7 +64,7 @@ class NotesToPinecone:
         output_path = self.notes_dir / f"{pdf_path.stem}.txt"
         
         # Run the backend main.py
-        backend_main = Path("backend/main.py")
+        backend_main = Path(__file__).parent.parent / "main.py"
         
         cmd = [
             sys.executable, 

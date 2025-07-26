@@ -75,10 +75,16 @@ python process_pdf.py document.pdf -v
 python convert_to_text.py results.json -f rag
 ```
 
+**Pinecone integration (semantic search):**
+```bash
+python pinecone_notes.py document.pdf --pinecone-key YOUR_KEY --pinecone-env us-east-1
+```
+
 **Or run backend directly:**
 ```bash
 cd backend
 python main.py document.pdf -f rag
+python services/pinecone_integration.py document.pdf --pinecone-key YOUR_KEY
 ```
 
 ## 📁 Project Structure
@@ -99,11 +105,16 @@ notes-summarizer/
 │   │   └── processors/
 │   │       ├── __init__.py
 │   │       └── text_formatter.py   # Text output formatting
+│   ├── services/                # External integrations
+│   │   ├── __init__.py
+│   │   ├── pinecone_integration.py  # Pinecone vector database
+│   │   └── example_pinecone_usage.py # Usage examples
 │   ├── main.py                  # Main backend application
 │   ├── convert_json_to_text.py  # JSON to text converter
 │   └── __init__.py
 ├── process_pdf.py               # Main entry point (wrapper)
 ├── convert_to_text.py           # Text converter (wrapper)
+├── pinecone_notes.py            # Pinecone integration (wrapper)
 ├── requirements.txt             # Dependencies
 ├── .env                        # Environment variables
 └── README.md                   # This file

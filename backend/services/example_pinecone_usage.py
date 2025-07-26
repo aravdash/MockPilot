@@ -9,8 +9,13 @@ This example shows how to:
 """
 
 import os
+import sys
 from pathlib import Path
-from pinecone_integration import NotesToPinecone
+
+# Add backend to path
+sys.path.append(str(Path(__file__).parent.parent))
+
+from services.pinecone_integration import NotesToPinecone
 
 def example_usage():
     """Example of processing PDFs and uploading to Pinecone"""
@@ -92,13 +97,13 @@ def simple_workflow_example():
     
     # Step 3: Process documents
     print("3. Process your PDFs:")
-    print("   python pinecone_integration.py document1.pdf document2.pdf \\")
+    print("   python backend/services/pinecone_integration.py document1.pdf document2.pdf \\")
     print("     --pinecone-key YOUR_KEY --pinecone-env us-east-1")
     print()
     
     # Step 4: Search
     print("4. Search your notes:")
-    print("   python pinecone_integration.py document1.pdf \\")
+    print("   python backend/services/pinecone_integration.py document1.pdf \\")
     print("     --pinecone-key YOUR_KEY --pinecone-env us-east-1 \\")
     print("     --search 'machine learning concepts'")
     print()
