@@ -116,6 +116,7 @@ notes-summarizer/
 │   │   ├── __init__.py
 │   │   ├── pinecone_integration.py  # Pinecone vector database
 │   │   ├── api_server.py        # FastAPI web server
+│   │   ├── django_integration.py # Django framework integration
 │   │   └── example_pinecone_usage.py # Usage examples
 │   ├── main.py                  # Main backend application
 │   ├── convert_json_to_text.py  # JSON to text converter
@@ -124,6 +125,7 @@ notes-summarizer/
 ├── convert_to_text.py           # Text converter (wrapper)
 ├── pinecone_notes.py            # Pinecone integration (wrapper)
 ├── start_api.py                 # Web interface & API server
+├── DJANGO_SETUP.md              # Django integration guide
 ├── requirements.txt             # Dependencies
 ├── .env                        # Environment variables
 └── README.md                   # This file
@@ -300,6 +302,17 @@ python start_api.py
 
 ### **Frontend Integration Examples**
 
+**Django Integration:**
+```python
+# Add to your Django project
+from backend.services.django_integration import django_notes
+
+def search_view(request):
+    client = django_notes.get_pinecone_client()
+    results = client.search_notes(query="machine learning")
+    return render(request, 'results.html', {'results': results})
+```
+
 **React/Vue/Angular:**
 ```javascript
 // Search your notes
@@ -326,6 +339,30 @@ const uploadPDF = async (file) => {
 ```
 
 **Security Note:** The API server keeps your Pinecone keys secure on the backend - never expose them to frontend code!
+
+### **🐍 Django Integration**
+
+Full Django integration with models, views, and templates:
+
+```python
+# Quick Django setup
+from backend.services.django_integration import django_notes, ProcessedDocument
+
+# In your Django views
+def search_view(request):
+    client = django_notes.get_pinecone_client()
+    results = client.search_notes(query=request.POST['query'])
+    return render(request, 'results.html', {'results': results})
+```
+
+**Features:**
+- 📊 **Database Models** - Track processed documents and search analytics
+- 🔐 **User Authentication** - Per-user document isolation
+- 📝 **Template Tags** - Ready-to-use search forms
+- 🔄 **Background Processing** - Django-RQ/Celery integration
+- 🌐 **API Endpoints** - RESTful API for AJAX/frontend frameworks
+
+📖 **[Complete Django Setup Guide →](DJANGO_SETUP.md)**
 
 ## 🛠️ Advanced Usage
 
