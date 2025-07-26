@@ -18,8 +18,11 @@ lxml>=4.9.0
 # Mathematical OCR
 # texteller  # Will need to be installed separately or from source
 
-# OpenAI for diagrams only
+# OpenAI for diagrams and embeddings
 openai>=1.3.0
+
+# Vector Database (Optional)
+pinecone-client>=3.0.0
 
 # Document Processing
 PyMuPDF>=1.23.0  # Alternative to pdf2image
