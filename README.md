@@ -80,6 +80,13 @@ python convert_to_text.py results.json -f rag
 python pinecone_notes.py document.pdf --pinecone-key YOUR_KEY --pinecone-env us-east-1
 ```
 
+**Start web interface with API:**
+```bash
+python start_api.py
+# Opens: http://localhost:8000 (search interface)
+# API docs: http://localhost:8000/docs
+```
+
 **Or run backend directly:**
 ```bash
 cd backend
@@ -108,6 +115,7 @@ notes-summarizer/
 │   ├── services/                # External integrations
 │   │   ├── __init__.py
 │   │   ├── pinecone_integration.py  # Pinecone vector database
+│   │   ├── api_server.py        # FastAPI web server
 │   │   └── example_pinecone_usage.py # Usage examples
 │   ├── main.py                  # Main backend application
 │   ├── convert_json_to_text.py  # JSON to text converter
@@ -115,6 +123,7 @@ notes-summarizer/
 ├── process_pdf.py               # Main entry point (wrapper)
 ├── convert_to_text.py           # Text converter (wrapper)
 ├── pinecone_notes.py            # Pinecone integration (wrapper)
+├── start_api.py                 # Web interface & API server
 ├── requirements.txt             # Dependencies
 ├── .env                        # Environment variables
 └── README.md                   # This file
@@ -262,6 +271,61 @@ Mathematical equation: H(x) = \sum_{i=0}^{n-1} x_i \cdot 2^i \mod p
 
 The collision resistance property ensures that finding two different inputs that produce the same hash output is computationally infeasible.
 ```
+
+## 🌐 **Frontend & Web Interface**
+
+### **Built-in Web Interface**
+Start the web server to get a searchable interface:
+
+```bash
+python start_api.py
+```
+
+**Features:**
+- 🔍 **Semantic Search** - Natural language queries across all notes
+- 📄 **File Upload** - Drag & drop PDF processing  
+- 🏷️ **Namespace Organization** - Group by subject/course
+- 📊 **Similarity Scoring** - See relevance percentages
+- 🚀 **Real-time Results** - Fast vector search
+
+### **API Endpoints**
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/` | GET | Web search interface |
+| `/api/search` | POST | Semantic search API |
+| `/api/upload` | POST | Upload & process PDFs |
+| `/api/health` | GET | Server health check |
+| `/docs` | GET | Interactive API documentation |
+
+### **Frontend Integration Examples**
+
+**React/Vue/Angular:**
+```javascript
+// Search your notes
+const searchNotes = async (query) => {
+  const response = await fetch('http://localhost:8000/api/search', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query, top_k: 5 })
+  });
+  return response.json();
+};
+
+// Upload PDFs
+const uploadPDF = async (file) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  
+  const response = await fetch('http://localhost:8000/api/upload', {
+    method: 'POST',
+    body: formData
+  });
+  return response.json();
+};
+```
+
+**Security Note:** The API server keeps your Pinecone keys secure on the backend - never expose them to frontend code!
 
 ## 🛠️ Advanced Usage
 
