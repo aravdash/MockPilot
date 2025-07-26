@@ -27,7 +27,12 @@ git clone <repository-url>
 cd notes-summarizer
 ```
 
-2. **Install dependencies**:
+2. **Run setup script** (recommended):
+```bash
+python setup.py
+```
+
+**Or manually install dependencies**:
 ```bash
 pip install -r requirements.txt
 ```
@@ -42,53 +47,66 @@ echo "OPENAI_API_KEY=your_openai_api_key_here" > .env
 
 **Process a PDF document (default JSON output):**
 ```bash
-python main.py document.pdf
+python process_pdf.py document.pdf
 ```
 
 **Output as readable text:**
 ```bash
-python main.py document.pdf -f text
+python process_pdf.py document.pdf -f text
 ```
 
 **Output as RAG-optimized text:**
 ```bash
-python main.py document.pdf -f rag
+python process_pdf.py document.pdf -f rag
 ```
 
 **With custom output file:**
 ```bash
-python main.py document.pdf -o results.txt -f text
+python process_pdf.py document.pdf -o results.txt -f text
 ```
 
 **Verbose logging:**
 ```bash
-python main.py document.pdf -v
+python process_pdf.py document.pdf -v
 ```
 
 **Convert existing JSON to text:**
 ```bash
-python convert_json_to_text.py results.json -f rag
+python convert_to_text.py results.json -f rag
+```
+
+**Or run backend directly:**
+```bash
+cd backend
+python main.py document.pdf -f rag
 ```
 
 ## 📁 Project Structure
 
 ```
 notes-summarizer/
-├── src/
-│   ├── __init__.py
-│   ├── config.py                 # Configuration settings
-│   └── extractors/
-│       ├── base.py              # Base extractor class
-│       ├── text_extractor.py    # Text OCR (PaddleOCR + EasyOCR)
-│       ├── table_extractor.py   # Table extraction (PP-Structure)
-│       ├── equation_extractor.py # Math OCR (Nougat/TexTeller)
-│       ├── code_extractor.py    # Code detection
-│       └── diagram_extractor.py # Diagram analysis (OpenAI)
-├── main.py                      # Main application
-├── convert_json_to_text.py     # JSON to text converter
-├── requirements.txt            # Dependencies
-├── .env                       # Environment variables
-└── README.md                  # This file
+├── backend/                     # Backend processing system
+│   ├── src/
+│   │   ├── __init__.py
+│   │   ├── config.py            # Configuration settings
+│   │   ├── extractors/
+│   │   │   ├── base.py          # Base extractor class
+│   │   │   ├── text_extractor.py    # Text OCR (PaddleOCR + EasyOCR)
+│   │   │   ├── table_extractor.py   # Table extraction (PP-Structure)
+│   │   │   ├── equation_extractor.py # Math OCR (Nougat/TexTeller)
+│   │   │   ├── code_extractor.py    # Code detection
+│   │   │   └── diagram_extractor.py # Diagram analysis (OpenAI)
+│   │   └── processors/
+│   │       ├── __init__.py
+│   │       └── text_formatter.py   # Text output formatting
+│   ├── main.py                  # Main backend application
+│   ├── convert_json_to_text.py  # JSON to text converter
+│   └── __init__.py
+├── process_pdf.py               # Main entry point (wrapper)
+├── convert_to_text.py           # Text converter (wrapper)
+├── requirements.txt             # Dependencies
+├── .env                        # Environment variables
+└── README.md                   # This file
 ```
 
 ## 🔧 Configuration
@@ -241,7 +259,7 @@ The collision resistance property ensures that finding two different inputs that
 Create a new extractor by inheriting from `BaseExtractor`:
 
 ```python
-from src.extractors.base import BaseExtractor
+from backend.src.extractors.base import BaseExtractor
 
 class CustomExtractor(BaseExtractor):
     def can_handle(self, image, region_bbox=None):
@@ -261,6 +279,8 @@ class CustomExtractor(BaseExtractor):
 
 ```python
 from pathlib import Path
+import sys
+sys.path.append('backend')
 from main import DocumentProcessor
 
 processor = DocumentProcessor()

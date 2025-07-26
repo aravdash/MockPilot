@@ -5,12 +5,12 @@
             "name": "Debug Notes Summarizer",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/main.py",
+            "program": "${workspaceFolder}/backend/main.py",
             "args": [
                 "C:\\path\\to\\your\\test\\document.pdf"
             ],
             "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}",
+            "cwd": "${workspaceFolder}/backend",
             "env": {},
             "envFile": "${workspaceFolder}/.env"
         }
